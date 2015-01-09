@@ -47,5 +47,20 @@ public class Pixy {
 			}
 		}
 	}
+	public int getSignature() {
+		return Signature;
+	}
+	public int getX() {
+		return X;
+	}
+	public int getY() {
+		return Y;
+	}
+	public int getHeight() {
+		return Height;
+	}
+	public int getWidth() {
+		return Width;
+	}
 
 } 
