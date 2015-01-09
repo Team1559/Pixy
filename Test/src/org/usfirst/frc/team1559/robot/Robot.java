@@ -68,7 +68,7 @@ public class Robot extends IterativeRobot {
 			System.out.println("Teleop Periodic");
 		}
 		z = false;
-		pixy.read();
+		pixy.readPacket();
 
 	}
 
