@@ -14,8 +14,8 @@ public class Robot extends IterativeRobot {
 	boolean y;
 	boolean z;
 	Pixy pixy;
-	int offsetOfWidth;
-	int screenX;
+	int count = 0;
+	final int halfBand = 3;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -60,6 +60,7 @@ public class Robot extends IterativeRobot {
 		System.out.println("Teleop Init");
 		z = true;
 		pixy.pixyReset();
+		count = 0;
 	}
 
 	/**
@@ -71,27 +72,29 @@ public class Robot extends IterativeRobot {
 			z = false;
 		}
 		
-		if (pixy.readPacket()){
-			System.out.println("The X position of object is " + pixy.getX());
-			System.out.println("The Y position of object is " + pixy.getY());
-			System.out.println("The width of object is " + pixy.getWidth());
-			System.out.println("The height of object is " + pixy.getHeight());
-			System.out.println("The signature of object is " + pixy.getSignature());
+		PixyPacket pkt = pixy.readPacket(1);
+		if (pkt != null){
+			if(count++ < 100){
+				return;
+			}
 			
-			offsetOfWidth = pixy.getWidth()/2;
-			screenX = pixy.getX() + offsetOfWidth;
+			count = 0;
 			
-			if (screenX < 320){
+			System.out.println("The X position of object is " + pkt.X);
+			//System.out.println("The Y position of object is " + pixy.getY());
+			//System.out.println("The width of object is " + pixy.getWidth());
+			//System.out.println("The height of object is " + pixy.getHeight());
+			//System.out.println("The signature of object is " + pixy.getSignature());
+			int objectX = pkt.X;
+			
+			if (objectX < 160 - halfBand){
 				System.out.println("Right!");
-			} else if (screenX > 320){
+			} else if (objectX > 160 + halfBand){
 				System.out.println("Left!");
 			} else {
 				System.out.println("Centered!");
 			}
-			
-			
-		}
-
+		} 
 	}
 
 	/**
