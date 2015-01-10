@@ -68,12 +68,16 @@ public class Robot extends IterativeRobot {
 			System.out.println("Teleop Periodic");
 		}
 		z = false;
-		pixy.readPacket();
-		System.out.println("The X position of object is " + pixy.getX());
-		System.out.println("The Y position of object is " + pixy.getY());
-		System.out.println("The width of object is " + pixy.getWidth());
-		System.out.println("The height of object is " + pixy.getHeight());
-		System.out.println("The signature of object is " + pixy.getSignature());
+		if(pixy.readPacket()){
+			System.out.println("The X position of object is " + pixy.getX());
+			System.out.println("The Y position of object is " + pixy.getY());
+			System.out.println("The width of object is " + pixy.getWidth());
+			System.out.println("The height of object is " + pixy.getHeight());
+			System.out.println("The signature of object is " + pixy.getSignature());
+		}
+		else{
+			System.out.println("Packet not valid :(");
+		}
 
 	}
 

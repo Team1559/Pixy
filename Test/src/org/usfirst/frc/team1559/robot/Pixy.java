@@ -19,33 +19,41 @@ public class Pixy {
 		pixy = new SerialPort(19200, port);
 		pixy.setReadBufferSize(14);
 	}
-	public void readPacket() {
+	
+	public int cvt(byte upper, byte lower) {
+		return (((int)upper & 0xff) << 8) | ((int)lower & 0xff);
+	}
+	
+	public boolean readPacket() {
 		byte[] rawData = new byte[12];
-		int[] dataToParse = new int[12];
 		byte[] waitForSync = new byte[2];
-		int[] syncWait = new int[2];
+		
 		pixy.reset();
+		
 		waitForSync = pixy.read(2);
-		for(int i = 0; i < waitForSync.length; i++){
-			syncWait[i] = ((int) waitForSync[i] & 0xff);
-		}
-		int syncWord = ((syncWait[1] << 8) | syncWait[0]);
-//		System.out.println(syncWord);
+		int syncWord = cvt(waitForSync[1], waitForSync[0]);
+	    
 		if (syncWord == 0xaa55){
-			System.out.println("We Did It Mom!!");
-			for(int noti = 0; noti < rawData.length; noti++){
-				dataToParse[noti] = ((int) rawData[noti] & 0xff);
-			}
-			Checksum = ((dataToParse[1] << 8) | dataToParse[0]);
-			Signature = ((dataToParse[3] << 8) | dataToParse[2]);
-			X = ((dataToParse[5] << 8) | dataToParse[4]);
-			Y = ((dataToParse[7] << 8) | dataToParse[6]);
-			Width = ((dataToParse[9] << 8) | dataToParse[8]);
-			Height = ((dataToParse[11] << 8) | dataToParse[10]);
+			rawData = pixy.read(12);
+			 
+			Checksum = cvt(rawData[1], rawData[0]);
+			Signature = cvt(rawData[3], rawData[2]);
+			X = cvt(rawData[5], rawData[4]);
+			Y = cvt(rawData[7], rawData[6]);
+			Width = cvt(rawData[9], rawData[8]);
+			Height = cvt(rawData[11], rawData[10]);
+			
 			if (Checksum == Signature + X + Y + Width + Height){
 				System.out.println("Packet is Valid Yay");
+				return true;
+			}
+			else{ 
+				System.out.println("Checksum didn't work :(");
+				return false;
 			}
 		}
+	
+		else return false;
 	}
 	public int getSignature() {
 		return Signature;
