@@ -59,7 +59,7 @@ public class Robot extends IterativeRobot {
 	public void teleopInit() {
 		System.out.println("Teleop Init");
 		z = true;
-
+		pixy.pixyReset();
 	}
 
 	/**
@@ -90,8 +90,6 @@ public class Robot extends IterativeRobot {
 			}
 			
 			
-		} else {
-			//System.out.println("Packet not valid :(");
 		}
 
 	}
