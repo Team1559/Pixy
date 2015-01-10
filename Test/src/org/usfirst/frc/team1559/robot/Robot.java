@@ -14,6 +14,8 @@ public class Robot extends IterativeRobot {
 	boolean y;
 	boolean z;
 	Pixy pixy;
+	int offsetOfWidth;
+	int screenX;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -66,17 +68,30 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		if (z == true) {
 			System.out.println("Teleop Periodic");
+			z = false;
 		}
-		z = false;
-		if(pixy.readPacket()){
+		
+		if (pixy.readPacket()){
 			System.out.println("The X position of object is " + pixy.getX());
 			System.out.println("The Y position of object is " + pixy.getY());
 			System.out.println("The width of object is " + pixy.getWidth());
 			System.out.println("The height of object is " + pixy.getHeight());
 			System.out.println("The signature of object is " + pixy.getSignature());
-		}
-		else{
-			System.out.println("Packet not valid :(");
+			
+			offsetOfWidth = pixy.getWidth()/2;
+			screenX = pixy.getX() + offsetOfWidth;
+			
+			if (screenX < 320){
+				System.out.println("Right!");
+			} else if (screenX > 320){
+				System.out.println("Left!");
+			} else {
+				System.out.println("Centered!");
+			}
+			
+			
+		} else {
+			//System.out.println("Packet not valid :(");
 		}
 
 	}
