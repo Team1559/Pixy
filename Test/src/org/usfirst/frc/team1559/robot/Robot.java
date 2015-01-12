@@ -1,6 +1,7 @@
 package org.usfirst.frc.team1559.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -16,6 +17,7 @@ public class Robot extends IterativeRobot {
 	Pixy pixy;
 	int count = 0;
 	final int halfBand = 3;
+	Joystick pad;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -24,6 +26,7 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		System.out.println("Robot Init");
 		pixy = new Pixy();
+		pad = new Joystick(0);
 
 	}
 
@@ -73,28 +76,24 @@ public class Robot extends IterativeRobot {
 		}
 		
 		PixyPacket pkt = pixy.readPacket(1);
+		PixyPacket pkt1 = pixy.readPacket(2);
 		if (pkt != null){
-			if(count++ < 100){
-				return;
-			}
+			if (pad.getRawButton(2)){
 			
-			count = 0;
-			
-			System.out.println("The X position of object is " + pkt.X);
+				System.out.println("The X position of object 1 is " + pkt.X);
 			//System.out.println("The Y position of object is " + pixy.getY());
 			//System.out.println("The width of object is " + pixy.getWidth());
 			//System.out.println("The height of object is " + pixy.getHeight());
-			//System.out.println("The signature of object is " + pixy.getSignature());
-			int objectX = pkt.X;
-			
-			if (objectX < 160 - halfBand){
-				System.out.println("Right!");
-			} else if (objectX > 160 + halfBand){
-				System.out.println("Left!");
-			} else {
-				System.out.println("Centered!");
 			}
+			
 		} 
+		if (pkt1 != null){
+			if (pad.getRawButton(1)){
+			
+				System.out.println("The X position of object 2 is " + pkt1.X);
+			 
+			}
+		}
 	}
 
 	/**

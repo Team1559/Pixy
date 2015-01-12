@@ -2,7 +2,7 @@ package org.usfirst.frc.team1559.robot;
 
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.SerialPort.Port;
-
+//Warning: if the pixy is plugged in through mini usb, this code WILL NOT WORK b/c the pixy is smart and detects where it should send data
 public class Pixy {
 	SerialPort pixy;
 	Port port = Port.kMXP;
@@ -13,18 +13,14 @@ public class Pixy {
 		pixy.setReadBufferSize(14);
 		packets = new PixyPacket[7];
 	}
-	
+	//This method parses raw data from the pixy into readable integers
 	public int cvt(byte upper, byte lower) {
 		return (((int)upper & 0xff) << 8) | ((int)lower & 0xff);
 	}
 	public void pixyReset(){
 		pixy.reset();
 	}
-	
-	public void ClearPacket(int Signature) {
-		packets[Signature] = null;
-	}
-	
+	//This method gathers data, then parses that data, and assigns the ints to global variables
 	public PixyPacket readPacket(int Signature) {
 		int Checksum;
 		int Sig;
@@ -33,12 +29,15 @@ public class Pixy {
 		int i = 0;
 		
 		while (i <= 16) {
-			int syncWord = cvt(rawData[i+1], rawData[i+0]);
+			int syncWord = cvt(rawData[i+1], rawData[i+0]); //Parse first 2 bytes
 		    
-			if (syncWord == 0xaa55) {
-				syncWord = cvt(rawData[i+3], rawData[i+2]);
-				if (syncWord != 0xaa55)
-					i -= 2;
+			if (syncWord == 0xaa55) {   //Check is first 2 bytes equal a "sync word", which indicates the start of a packet of valid data
+				syncWord = cvt(rawData[i+3], rawData[i+2]); //Parse the next 2 bytes
+				
+				if (syncWord != 0xaa55){ //Shifts everything in the case that one syncword is sent
+					i -= 2;              
+				}
+				//This next block parses the rest of the data
 					Checksum = cvt(rawData[i+5], rawData[i+4]);					
 					Sig = cvt(rawData[i+7], rawData[i+6]);
 					
@@ -47,7 +46,7 @@ public class Pixy {
 					packets[Sig - 1].Y = cvt(rawData[i+11], rawData[i+10]);
 					packets[Sig - 1].Width = cvt(rawData[i+13], rawData[i+12]);
 					packets[Sig - 1].Height = cvt(rawData[i+15], rawData[i+14]);
-					
+					//Checks whether the data is valid using the checksum *This if block should never be entered*
 					if (Checksum != Sig + packets[Sig - 1].X + packets[Sig - 1].Y + packets[Sig - 1].Width + packets[Sig - 1].Height) {
 						System.out.println("Checksum error");
 						packets[Sig - 1] = null;
@@ -56,8 +55,9 @@ public class Pixy {
 			}
 			i++;
 		}
-		PixyPacket pkt = packets[Signature];
-		packets[Signature] = null;
+		//Assigns our packet to a temp packet, then deletes data so that we dont return old data
+		PixyPacket pkt = packets[Signature - 1];
+		packets[Signature - 1] = null;
 		return pkt;
 	}
 } 
