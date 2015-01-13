@@ -74,25 +74,26 @@ public class Robot extends IterativeRobot {
 			System.out.println("Teleop Periodic");
 			z = false;
 		}
-		
-		PixyPacket pkt = pixy.readPacket(1);
-		PixyPacket pkt1 = pixy.readPacket(2);
+		PixyPacket pkt = null;
+		PixyPacket pkt1 = null;
+		try{
+			pkt = pixy.readPacket(1);
+			pkt1 = pixy.readPacket(2);
+		} catch (PixyException e){
+			e.printStackTrace();
+		}
 		if (pkt != null){
-			if (pad.getRawButton(2)){
 			
-				System.out.println("The X position of object 1 is " + pkt.X);
+			System.out.println("The X position of object 1 is " + pkt.X);
 			//System.out.println("The Y position of object is " + pixy.getY());
 			//System.out.println("The width of object is " + pixy.getWidth());
 			//System.out.println("The height of object is " + pixy.getHeight());
 			}
-			
-		} 
-		if (pkt1 != null){
-			if (pad.getRawButton(1)){
-			
-				System.out.println("The X position of object 2 is " + pkt1.X);
 			 
-			}
+		if (pkt1 != null){
+			
+			System.out.println("The X position of object 2 is " + pkt1.X);
+			 
 		}
 	}
 

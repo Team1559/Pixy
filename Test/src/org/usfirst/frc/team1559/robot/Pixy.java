@@ -7,11 +7,14 @@ public class Pixy {
 	SerialPort pixy;
 	Port port = Port.kMXP;
 	PixyPacket[] packets;
+	PixyException pExc;
+	String print;
 
 	public Pixy() {
 		pixy = new SerialPort(19200, port);
 		pixy.setReadBufferSize(14);
 		packets = new PixyPacket[7];
+		pExc = new PixyException(print);
 	}
 	//This method parses raw data from the pixy into readable integers
 	public int cvt(byte upper, byte lower) {
@@ -21,14 +24,16 @@ public class Pixy {
 		pixy.reset();
 	}
 	//This method gathers data, then parses that data, and assigns the ints to global variables
-	public PixyPacket readPacket(int Signature) {
+	public PixyPacket readPacket(int Signature) throws PixyException {
 		int Checksum;
 		int Sig;
 		byte[] rawData = new byte[32];
-		rawData = pixy.read(32);
-		int i = 0;
+		try{
+			rawData = pixy.read(32);
+		} catch (RuntimeException e){
+		}
 		
-		while (i <= 16) {
+		for (int i = 0; i <= 16; i++) {
 			int syncWord = cvt(rawData[i+1], rawData[i+0]); //Parse first 2 bytes
 		    
 			if (syncWord == 0xaa55) {   //Check is first 2 bytes equal a "sync word", which indicates the start of a packet of valid data
@@ -48,14 +53,14 @@ public class Pixy {
 					packets[Sig - 1].Height = cvt(rawData[i+15], rawData[i+14]);
 					//Checks whether the data is valid using the checksum *This if block should never be entered*
 					if (Checksum != Sig + packets[Sig - 1].X + packets[Sig - 1].Y + packets[Sig - 1].Width + packets[Sig - 1].Height) {
-						System.out.println("Checksum error");
 						packets[Sig - 1] = null;
+						throw pExc;
 					}
-					break;	
+					break;
 			}
-			i++;
 		}
 		//Assigns our packet to a temp packet, then deletes data so that we dont return old data
+		
 		PixyPacket pkt = packets[Signature - 1];
 		packets[Signature - 1] = null;
 		return pkt;
