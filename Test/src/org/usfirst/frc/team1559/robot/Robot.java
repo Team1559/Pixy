@@ -1,7 +1,12 @@
 package org.usfirst.frc.team1559.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.PIDOutput;
+import edu.wpi.first.wpilibj.PIDSource;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -18,6 +23,7 @@ public class Robot extends IterativeRobot {
 	int count = 0;
 	final int halfBand = 3;
 	Joystick pad;
+	PWM tiltServo;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -27,6 +33,7 @@ public class Robot extends IterativeRobot {
 		System.out.println("Robot Init");
 		pixy = new Pixy();
 		pad = new Joystick(0);
+		tiltServo = new PWM(0);
 
 	}
 
@@ -83,9 +90,11 @@ public class Robot extends IterativeRobot {
 			e.printStackTrace();
 		}
 		if (pkt != null){
-			
-			System.out.println("The X position of object 1 is " + pkt.X);
-			//System.out.println("The Y position of object is " + pixy.getY());
+			System.out.println("The Y position of object 1 is " + pkt.Y);
+			int Y = 0;
+			Y = (pkt.Y - 120)*2;
+			tiltServo.setRaw(600 - Y);
+			//tiltServo.setRaw();
 			//System.out.println("The width of object is " + pixy.getWidth());
 			//System.out.println("The height of object is " + pixy.getHeight());
 			}
