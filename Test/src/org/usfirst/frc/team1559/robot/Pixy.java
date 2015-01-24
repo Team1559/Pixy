@@ -31,11 +31,13 @@ public class Pixy {
 		try{
 			rawData = pixy.read(32);
 		} catch (RuntimeException e){
+			
 		}
-		
+		if(rawData.length < 32){
+			return null;
+		}
 		for (int i = 0; i <= 16; i++) {
 			int syncWord = cvt(rawData[i+1], rawData[i+0]); //Parse first 2 bytes
-		    
 			if (syncWord == 0xaa55) {   //Check is first 2 bytes equal a "sync word", which indicates the start of a packet of valid data
 				syncWord = cvt(rawData[i+3], rawData[i+2]); //Parse the next 2 bytes
 				
@@ -45,7 +47,9 @@ public class Pixy {
 				//This next block parses the rest of the data
 					Checksum = cvt(rawData[i+5], rawData[i+4]);					
 					Sig = cvt(rawData[i+7], rawData[i+6]);
-					
+					if(Sig <= 0 || Sig > packets.length){
+						break;
+					}
 					packets[Sig - 1] = new PixyPacket();
 					packets[Sig - 1].X = cvt(rawData[i+9], rawData[i+8]);
 					packets[Sig - 1].Y = cvt(rawData[i+11], rawData[i+10]);

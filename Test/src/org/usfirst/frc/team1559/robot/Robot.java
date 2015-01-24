@@ -1,13 +1,9 @@
 package org.usfirst.frc.team1559.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.PIDOutput;
-import edu.wpi.first.wpilibj.PIDSource;
-
+import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.Talon;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
@@ -23,7 +19,8 @@ public class Robot extends IterativeRobot {
 	int count = 0;
 	final int halfBand = 3;
 	Joystick pad;
-	PWM tiltServo;
+	Talon leftMotor;
+	Talon rightMotor;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -33,8 +30,8 @@ public class Robot extends IterativeRobot {
 		System.out.println("Robot Init");
 		pixy = new Pixy();
 		pad = new Joystick(0);
-		tiltServo = new PWM(0);
-
+		leftMotor = new Talon(6);
+		rightMotor = new Talon(8);
 	}
 
 	public void disabledInit() {
@@ -53,34 +50,14 @@ public class Robot extends IterativeRobot {
 	public void autonomousInit() {
 		System.out.println("Autonomous Init");
 		y = true;
+		pixy.pixyReset();
+		count = 0;
 	}
 
 	/**
 	 * This function is called periodically during autonomous
 	 */
 	public void autonomousPeriodic() {
-		if (y == true) {
-			System.out.println("Autonomous Periodic");
-		}
-		y = false;
-
-	}
-
-	public void teleopInit() {
-		System.out.println("Teleop Init");
-		z = true;
-		pixy.pixyReset();
-		count = 0;
-	}
-
-	/**
-	 * This function is called periodically during operator control
-	 */
-	public void teleopPeriodic() {
-		if (z == true) {
-			System.out.println("Teleop Periodic");
-			z = false;
-		}
 		PixyPacket pkt = null;
 		PixyPacket pkt1 = null;
 		try{
@@ -90,10 +67,20 @@ public class Robot extends IterativeRobot {
 			e.printStackTrace();
 		}
 		if (pkt != null){
-			System.out.println("The Y position of object 1 is " + pkt.Y);
-			int Y = 0;
-			Y = (pkt.Y - 120)*2;
-			tiltServo.setRaw(600 - Y);
+			System.out.println("The X position of object 1 is " + pkt.X);
+			if (pkt.X < 150){
+				leftMotor.set(-0.2);
+				rightMotor.set(0.2);
+			}
+			else if(pkt.X > 170){
+				leftMotor.set(0.2);
+				rightMotor.set(-0.2);
+			}
+			else{
+				leftMotor.set(0);
+				rightMotor.set(0);
+			}
+			
 			//tiltServo.setRaw();
 			//System.out.println("The width of object is " + pixy.getWidth());
 			//System.out.println("The height of object is " + pixy.getHeight());
@@ -102,7 +89,23 @@ public class Robot extends IterativeRobot {
 		if (pkt1 != null){
 			
 			System.out.println("The X position of object 2 is " + pkt1.X);
+		}
 			 
+
+	}
+
+	public void teleopInit() {
+		System.out.println("Teleop Init");
+		z = true;
+	}
+
+	/**
+	 * This function is called periodically during operator control
+	 */
+	public void teleopPeriodic() {
+		if (z == true) {
+			System.out.println("Teleop Periodic");
+			z = false;
 		}
 	}
 
