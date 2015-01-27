@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
@@ -21,6 +22,7 @@ public class Robot extends IterativeRobot {
 	Joystick pad;
 	Talon leftMotor;
 	Talon rightMotor;
+	PixyController p;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -32,6 +34,7 @@ public class Robot extends IterativeRobot {
 		pad = new Joystick(0);
 		leftMotor = new Talon(6);
 		rightMotor = new Talon(8);
+		p = new PixyController(pixy);
 	}
 
 	public void disabledInit() {
@@ -58,40 +61,8 @@ public class Robot extends IterativeRobot {
 	 * This function is called periodically during autonomous
 	 */
 	public void autonomousPeriodic() {
-		PixyPacket pkt = null;
-		PixyPacket pkt1 = null;
-		try{
-			pkt = pixy.readPacket(1);
-			pkt1 = pixy.readPacket(2);
-		} catch (PixyException e){
-			e.printStackTrace();
-		}
-		if (pkt != null){
-			System.out.println("The X position of object 1 is " + pkt.X);
-			if (pkt.X < 150){
-				leftMotor.set(-0.2);
-				rightMotor.set(0.2);
-			}
-			else if(pkt.X > 170){
-				leftMotor.set(0.2);
-				rightMotor.set(-0.2);
-			}
-			else{
-				leftMotor.set(0);
-				rightMotor.set(0);
-			}
-			
-			//tiltServo.setRaw();
-			//System.out.println("The width of object is " + pixy.getWidth());
-			//System.out.println("The height of object is " + pixy.getHeight());
-			}
-			 
-		if (pkt1 != null){
-			
-			System.out.println("The X position of object 2 is " + pkt1.X);
-		}
-			 
-
+		leftMotor.set(-p.autoCenter());
+		rightMotor.set(p.autoCenter());
 	}
 
 	public void teleopInit() {
