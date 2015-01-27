@@ -6,6 +6,7 @@ public class PixyController {
 	PixyPacket pkt;
 	double error;
 	public final double ratio = 109/80;
+	double objRatio = 0;
 	public PixyController(Pixy p){
 		pixy = new Pixy();
 		pkt = new PixyPacket();
@@ -17,8 +18,15 @@ public class PixyController {
 		} catch (PixyException e){
 			e.printStackTrace();
 		}
+		try{
+			objRatio = pkt.Height/pkt.Width;
+		}
+		catch (ArithmeticException a){
+			System.out.println("Object not being seen");
+			return 0;
+		}
 		if (pkt != null){
-			if ((ratio-.1) <= (pkt.Height/pkt.Width) && (ratio+.1) >= (pkt.Height/pkt.Width)){
+			if ((ratio-.1) <= (objRatio) && (ratio+.1) >= (objRatio)){
 				if (pkt.X < 150 || pkt.X > 170){
 					error = 160-pkt.X;
 					error = error/160;
@@ -27,7 +35,7 @@ public class PixyController {
 					error = 0;
 				}
 			}
-			else if((pkt.Height/pkt.Width) > (ratio+0.1)){
+			else if((objRatio) > (ratio+0.1)){
 				error = 0;
 			}
 			else{
