@@ -1,5 +1,5 @@
 package org.usfirst.frc.team1559.robot;
-
+//NOTE: Pixy is offset 3 in to the right
 
 public class PixyController {
 	Pixy pixy;
@@ -27,9 +27,10 @@ public class PixyController {
 		}
 		if (pkt != null){
 			if ((ratio-.1) <= (objRatio) && (ratio+.1) >= (objRatio)){
-				if (pkt.X < 150 || pkt.X > 170){
-					error = 160-pkt.X;
+				if (pkt.X < 70 || pkt.X > 90){
+					error = 80-pkt.X;
 					error = error/160;
+					error = error/2;
 				}
 				else{
 					error = 0;
@@ -43,7 +44,7 @@ public class PixyController {
 			}
 		}
 		else{
-			error = 0;
+			error = error - 0.05;
 		}
 		return error;
 	}
